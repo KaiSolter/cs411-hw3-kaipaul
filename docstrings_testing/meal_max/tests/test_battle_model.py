@@ -112,5 +112,24 @@ def test_highdif_battle_score(battle_model, sample_meal3):
 # Battle Test Cases
 ##################################################
 
-def test_battle_lowvmeddif(battle_model, sample_meal1, sample_meal2):
-    pass # todo
+def test_battle_lowvmed(battle_model, sample_meal1, sample_meal2, mocker):
+    mock_random = mocker.patch("meal_max.models.battle_model.get_random", return_value=0.5)
+    battle_model.combatants.extend(sample_meal1)
+    battle_model.combatants.extend(sample_meal2)
+    winner = battle_model.battle()
+    #Based on the random value of .5 and the delta of the battle scores meal 1 should win
+    assert winner == "Meal 1"
+    #Ensure that the loser has been removed
+    assert len(battle_model.combatants) == 1
+    assert battle_model.combatants[0].meal == "Meal 1"
+
+def test_battle_midvhigh(battle_model, sample_meal2, sample_meal3, mocker):
+    mock_random = mocker.patch("meal_max.models.battle_model.get_random", return_value=0.5)
+    battle_model.combatants.extend(sample_meal2)
+    battle_model.combatants.extend(sample_meal3)
+    winner = battle_model.battle()
+    #Based on the random value of .5 and the delta of the battle scores 
+    assert winner == "Meal 2"
+    #Ensure that the loser has been removed
+    assert len(battle_model.combatants) == 1
+    assert battle_model.combatants[0].meal == "Meal 2"
