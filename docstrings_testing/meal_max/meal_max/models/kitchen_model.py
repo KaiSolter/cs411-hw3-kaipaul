@@ -31,10 +31,10 @@ def create_meal(meal: str, cuisine: str, price: float, difficulty: str) -> None:
     Creates a new meal in the meals table.
 
     Args:
-        meal (str): The artist's name.
-        cuisine (str): The song title.
-        price (float): The year the song was released.
-        difficulty (str): The song genre.
+        meal (str): The meal's name.
+        cuisine (str): The kind of cusine it is.
+        price (float): how much the meal costs.
+        difficulty (str): How hard it is to cook a meal.
 
     Raises:
         ValueError: If year or duration are invalid.
