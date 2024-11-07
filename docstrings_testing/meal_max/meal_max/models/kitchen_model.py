@@ -231,6 +231,7 @@ def update_meal_stats(meal_id: int, result: str) -> None:
     Args:
         meal_id (int): The ID of the meal whose battle and win count should be incremented based
         on result.
+        result (str): The result of a battle
 
     Raises:
         ValueError: If the meal does not exist or is marked as deleted or result isn't a valid option.
