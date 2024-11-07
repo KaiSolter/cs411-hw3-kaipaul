@@ -65,6 +65,28 @@ def create_meal(meal: str, cuisine: str, price: float, difficulty: str) -> None:
     except sqlite3.Error as e:
         logger.error("Database error: %s", str(e))
         raise e
+  
+def clear_meals() -> None:
+    """
+    Recreates the meals table, effectively deleting all meals.
+
+    Raises:
+        sqlite3.Error: If any database error occurs.
+    """
+    try:
+        with open(os.getenv("SQL_CREATE_TABLE_PATH", "/app/sql/create_meal_table.sql"), "r") as fh:
+            create_table_script = fh.read()
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.executescript(create_table_script)
+            conn.commit()
+
+            logger.info("Meals cleared successfully.")
+
+    except sqlite3.Error as e:
+        logger.error("Database error while clearing meals: %s", str(e))
+        raise e
+
 
 
 def delete_meal(meal_id: int) -> None:
@@ -231,6 +253,7 @@ def update_meal_stats(meal_id: int, result: str) -> None:
     Args:
         meal_id (int): The ID of the meal whose battle and win count should be incremented based
         on result.
+        result (str): The result of a battle
 
     Raises:
         ValueError: If the meal does not exist or is marked as deleted or result isn't a valid option.
