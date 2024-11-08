@@ -249,6 +249,12 @@ def test_get_leaderboard(mock_cursor):
 
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
+    mock_cursor.fetchall.return_value = [
+        (1, "Meal A", "Cuisine A", 5.50, "LOW", 10, 8, False),
+        (2, "Meal B", "Cuisine B", 13.50, "MED", 10, 5, False),
+        (3, "Meal C", "Cuisine A", 40, "HIGH", 4, 4, False)
+    ]
+
     # Call the get_leaderboard function with param win_pct
     meals = get_leaderboard("win_pct")
 
