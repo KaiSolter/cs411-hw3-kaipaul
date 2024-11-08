@@ -177,9 +177,15 @@ prep_combatant() {
   fi
 }
 
-get_combatants() {
-  echo "Retrieving current song..."
-  response=$(curl -s -X GET "$BASE_URL/get-combatants")
+remove_song_from_playlist() {
+  artist=$1
+  title=$2
+  year=$3
+
+  echo "Removing song from playlist: $artist - $title ($year)..."
+  response=$(curl -s -X DELETE "$BASE_URL/remove-song-from-playlist" \
+    -H "Content-Type: application/json" \
+    -d "{\"artist\":\"$artist\", \"title\":\"$title\", \"year\":$year}")
 
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Combatants retrieved successfully."
