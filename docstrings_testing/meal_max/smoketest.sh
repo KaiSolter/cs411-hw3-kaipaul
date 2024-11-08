@@ -53,21 +53,20 @@ check_db() {
 #
 ##########################################################
 
-create_song() {
-  artist=$1
-  title=$2
-  year=$3
-  genre=$4
-  duration=$5
-
-  echo "Adding song ($artist - $title, $year) to the playlist..."
-  curl -s -X POST "$BASE_URL/create-song" -H "Content-Type: application/json" \
-    -d "{\"artist\":\"$artist\", \"title\":\"$title\", \"year\":$year, \"genre\":\"$genre\", \"duration\":$duration}" | grep -q '"status": "success"'
+create_meal() {
+  meal=$1
+  cuisine=$2
+  price=$3
+  difficulty=$4
+ 
+  echo "Adding meal ($meal) ..."
+  curl -s -X POST "$BASE_URL/create-meal" -H "Content-Type: application/json" \
+    -d "{\"meal\":\"$meal\", \"cuisine\":\"$cuisine\", \"price\":$price, \"difficulty\":\"$difficulty\}" | grep -q '"status": "success"'
 
   if [ $? -eq 0 ]; then
-    echo "Song added successfully."
+    echo "Meal added successfully."
   else
-    echo "Failed to add song."
+    echo "Failed to add meal."
     exit 1
   fi
 }
@@ -154,28 +153,26 @@ get_random_song() {
 
 ############################################################
 #
-# Playlist Management
+# Battle Management
 #
 ############################################################
 
-add_song_to_playlist() {
-  artist=$1
-  title=$2
-  year=$3
+prep_combatant() {
+  meal=$1
 
-  echo "Adding song to playlist: $artist - $title ($year)..."
-  response=$(curl -s -X POST "$BASE_URL/add-song-to-playlist" \
+  echo "Adding meal as combatant: $meal ..."
+  response=$(curl -s -X POST "$BASE_URL/prep-combatant" \
     -H "Content-Type: application/json" \
-    -d "{\"artist\":\"$artist\", \"title\":\"$title\", \"year\":$year}")
+    -d "{\"meal\":\"$meal\"}")
 
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Song added to playlist successfully."
+    echo "Meal added to combatant list successfully."
     if [ "$ECHO_JSON" = true ]; then
-      echo "Song JSON:"
+      echo "Meal JSON:"
       echo "$response" | jq .
     fi
   else
-    echo "Failed to add song to playlist."
+    echo "Failed to add meal to combatants"
     exit 1
   fi
 }
