@@ -49,7 +49,7 @@ check_db() {
 
 ##########################################################
 #
-# Song Management
+# Meal Management
 #
 ##########################################################
 
@@ -71,20 +71,20 @@ create_meal() {
   fi
 }
 
-delete_song_by_id() {
-  song_id=$1
+delete_meal_by_id() {
+  meal_id=$1
 
-  echo "Deleting song by ID ($song_id)..."
-  response=$(curl -s -X DELETE "$BASE_URL/delete-song/$song_id")
+  echo "Deleting song by ID ($meal_id)..."
+  response=$(curl -s -X DELETE "$BASE_URL/delete-song/$meal_id")
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Song deleted successfully by ID ($song_id)."
+    echo "Meal deleted successfully by ID ($meal_id)."
   else
-    echo "Failed to delete song by ID ($song_id)."
+    echo "Failed to delete meal by ID ($meal_id)."
     exit 1
   fi
 }
 
-get_all_songs() {
+get_all_meals() {
   echo "Getting all songs in the playlist..."
   response=$(curl -s -X GET "$BASE_URL/get-all-songs-from-catalog")
   if echo "$response" | grep -q '"status": "success"'; then
@@ -153,7 +153,7 @@ get_random_song() {
 
 ############################################################
 #
-# Battle Setup Management
+# Battle Management
 #
 ############################################################
 
@@ -188,25 +188,39 @@ remove_song_from_playlist() {
     -d "{\"artist\":\"$artist\", \"title\":\"$title\", \"year\":$year}")
 
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Combatants retrieved successfully."
+    echo "Song removed from playlist successfully."
     if [ "$ECHO_JSON" = true ]; then
-      echo "Current Combatants JSON:"
+      echo "Song JSON:"
       echo "$response" | jq .
     fi
   else
-    echo "Failed to retrieve combatants."
+    echo "Failed to remove song from playlist."
     exit 1
   fi
 }
 
-clear_combatants() {
-  echo "Clearing combatants..."
-  response=$(curl -s -X POST "$BASE_URL/clear-combatants")
+remove_song_by_track_number() {
+  track_number=$1
+
+  echo "Removing song by track number: $track_number..."
+  response=$(curl -s -X DELETE "$BASE_URL/remove-song-from-playlist-by-track-number/$track_number")
+
+  if echo "$response" | grep -q '"status":'; then
+    echo "Song removed from playlist by track number ($track_number) successfully."
+  else
+    echo "Failed to remove song from playlist by track number."
+    exit 1
+  fi
+}
+
+clear_playlist() {
+  echo "Clearing playlist..."
+  response=$(curl -s -X POST "$BASE_URL/clear-playlist")
 
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Combatants cleared successfully."
+    echo "Playlist cleared successfully."
   else
-    echo "Failed to clear combatants."
+    echo "Failed to clear playlist."
     exit 1
   fi
 }
