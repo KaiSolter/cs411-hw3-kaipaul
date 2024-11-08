@@ -55,7 +55,7 @@ check_db() {
 
 clear_catalog() {
   echo "Clearing the db..."
-  curl -s -X DELETE "$BASE_URL/clear-db" | grep -q '"status": "success"'
+  curl -s -X DELETE "$BASE_URL/clear-meals" | grep -q '"status": "success"'
 }
 
 create_meal() {
@@ -66,7 +66,7 @@ create_meal() {
  
   echo "Adding meal ($meal) ..."
   curl -s -X POST "$BASE_URL/create-meal" -H "Content-Type: application/json" \
-    -d "{\"meal\":\"$meal\", \"cuisine\":\"$cuisine\", \"price\":$price, \"difficulty\":\"$difficulty\}" | grep -q '"status": "success"'
+    -d "{\"meal\":\"$meal\", \"cuisine\":\"$cuisine\", \"price\":$price, \"difficulty\":\"$difficulty\"}"
 
   if [ $? -eq 0 ]; then
     echo "Meal added successfully."
