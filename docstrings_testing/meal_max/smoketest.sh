@@ -153,7 +153,7 @@ get_random_song() {
 
 ############################################################
 #
-# Battle Management
+# Battle Setup Management
 #
 ############################################################
 
@@ -177,54 +177,33 @@ prep_combatant() {
   fi
 }
 
-remove_song_from_playlist() {
-  artist=$1
-  title=$2
-  year=$3
-
-  echo "Removing song from playlist: $artist - $title ($year)..."
-  response=$(curl -s -X DELETE "$BASE_URL/remove-song-from-playlist" \
-    -H "Content-Type: application/json" \
-    -d "{\"artist\":\"$artist\", \"title\":\"$title\", \"year\":$year}")
+get_combatants() {
+  echo "Retrieving current song..."
+  response=$(curl -s -X GET "$BASE_URL/get-combatants")
 
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Song removed from playlist successfully."
+    echo "Combatants retrieved successfully."
     if [ "$ECHO_JSON" = true ]; then
-      echo "Song JSON:"
+      echo "Current Combatants JSON:"
       echo "$response" | jq .
     fi
   else
-    echo "Failed to remove song from playlist."
+    echo "Failed to retrieve combatants."
     exit 1
   fi
 }
 
-remove_song_by_track_number() {
-  track_number=$1
-
-  echo "Removing song by track number: $track_number..."
-  response=$(curl -s -X DELETE "$BASE_URL/remove-song-from-playlist-by-track-number/$track_number")
-
-  if echo "$response" | grep -q '"status":'; then
-    echo "Song removed from playlist by track number ($track_number) successfully."
-  else
-    echo "Failed to remove song from playlist by track number."
-    exit 1
-  fi
-}
-
-clear_playlist() {
-  echo "Clearing playlist..."
-  response=$(curl -s -X POST "$BASE_URL/clear-playlist")
+clear_combatants() {
+  echo "Clearing combatants..."
+  response=$(curl -s -X POST "$BASE_URL/clear-combatants")
 
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Playlist cleared successfully."
+    echo "Combatants cleared successfully."
   else
-    echo "Failed to clear playlist."
+    echo "Failed to clear combatants."
     exit 1
   fi
 }
-
 
 ############################################################
 #
