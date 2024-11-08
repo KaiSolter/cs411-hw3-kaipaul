@@ -240,50 +240,31 @@ get_meal_leaderboard_win_pct() {
 check_health
 check_db
 
-# Create songs
-create_song "The Beatles" "Hey Jude" 1968 "Rock" 180
-create_song "The Rolling Stones" "Paint It Black" 1966 "Rock" 180
-create_song "The Beatles" "Let It Be" 1970 "Rock" 180
-create_song "Queen" "Bohemian Rhapsody" 1975 "Rock" 180
-create_song "Led Zeppelin" "Stairway to Heaven" 1971 "Rock" 180
+# Clear the catalog
+clear_catalog
 
-delete_song_by_id 1
-get_all_songs
+# Create meals
+create_meal "Pizza" "Italian" 15.99 "MED" 
+create_meal "Tacos" "Mexican" 10.50 "LOW"
+create_meal "Sushi" "Japanese" 12.00 "HIGH"
+create_meal "Pho" "Vietnamese" 19.99 "MED"
+create_meal "Pancakes" "American" 5.99 "MED"
 
-get_song_by_id 2
-get_song_by_compound_key "The Beatles" "Let It Be" 1970
-get_random_song
+delete_meal_by_id 1
 
-add_song_to_playlist "The Rolling Stones" "Paint It Black" 1966
-add_song_to_playlist "Queen" "Bohemian Rhapsody" 1975
-add_song_to_playlist "Led Zeppelin" "Stairway to Heaven" 1971
-add_song_to_playlist "The Beatles" "Let It Be" 1970
+get_meal_by_id 2
+get_meal_by_name "Pho" 
 
-remove_song_from_playlist "The Beatles" "Let It Be" 1970
-remove_song_by_track_number 2
+prep_combatant "Tacos" 
+prep_combatant "Sushi" 
+battle
+clear_combatants
+prep_combatant "Pho" 
+prep_combatant "Pancakes"
+get_combatants
+battle
 
-get_all_songs_from_playlist
-
-add_song_to_playlist "Queen" "Bohemian Rhapsody" 1975
-add_song_to_playlist "The Beatles" "Let It Be" 1970
-
-move_song_to_beginning "The Beatles" "Let It Be" 1970
-move_song_to_end "Queen" "Bohemian Rhapsody" 1975
-move_song_to_track_number "Led Zeppelin" "Stairway to Heaven" 1971 2
-swap_songs_in_playlist 1 2
-
-get_all_songs_from_playlist
-get_song_from_playlist_by_track_number 1
-
-get_playlist_length_duration
-
-play_current_song
-rewind_playlist
-
-play_entire_playlist
-play_current_song
-play_rest_of_playlist
-
-get_song_leaderboard
+get_meal_leaderboard_wins
+get_meal_leaderboard_win_pct
 
 echo "All tests passed successfully!"
