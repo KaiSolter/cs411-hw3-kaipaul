@@ -75,7 +75,7 @@ delete_meal_by_id() {
   meal_id=$1
 
   echo "Deleting song by ID ($meal_id)..."
-  response=$(curl -s -X DELETE "$BASE_URL/delete-song/$meal_id")
+  response=$(curl -s -X DELETE "$BASE_URL/delete-meal/$meal_id")
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Meal deleted successfully by ID ($meal_id)."
   else
@@ -84,68 +84,36 @@ delete_meal_by_id() {
   fi
 }
 
-get_all_meals() {
-  echo "Getting all songs in the playlist..."
-  response=$(curl -s -X GET "$BASE_URL/get-all-songs-from-catalog")
+get_meal_by_id() {
+  meal_id=$1
+
+  echo "Getting meal by ID ($meal_id)..."
+  response=$(curl -s -X GET "$BASE_URL/get-meal-from-kitchen-by-id/$meal_id")
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "All songs retrieved successfully."
+    echo "Meal retrieved successfully by ID ($meal_id)."
     if [ "$ECHO_JSON" = true ]; then
-      echo "Songs JSON:"
+      echo "Meal JSON (ID $meal_id):"
       echo "$response" | jq .
     fi
   else
-    echo "Failed to get songs."
+    echo "Failed to get mean by ID ($meal_id)."
     exit 1
   fi
 }
 
-get_song_by_id() {
-  song_id=$1
+get_meal_by_name() {
+  meal=$1
 
-  echo "Getting song by ID ($song_id)..."
-  response=$(curl -s -X GET "$BASE_URL/get-song-from-catalog-by-id/$song_id")
+  echo "Getting meal by meal name (Meal: '$meal')..."
+  response=$(curl -s -X GET "$BASE_URL/get-meal-from-kitchen-by-name?meal=$(echo $meal | sed 's/ /%20/g')")
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Song retrieved successfully by ID ($song_id)."
+    echo "Meal retrieved successfully by compound key."
     if [ "$ECHO_JSON" = true ]; then
-      echo "Song JSON (ID $song_id):"
+      echo "Meal JSON (by name):"
       echo "$response" | jq .
     fi
   else
-    echo "Failed to get song by ID ($song_id)."
-    exit 1
-  fi
-}
-
-get_song_by_compound_key() {
-  artist=$1
-  title=$2
-  year=$3
-
-  echo "Getting song by compound key (Artist: '$artist', Title: '$title', Year: $year)..."
-  response=$(curl -s -X GET "$BASE_URL/get-song-from-catalog-by-compound-key?artist=$(echo $artist | sed 's/ /%20/g')&title=$(echo $title | sed 's/ /%20/g')&year=$year")
-  if echo "$response" | grep -q '"status": "success"'; then
-    echo "Song retrieved successfully by compound key."
-    if [ "$ECHO_JSON" = true ]; then
-      echo "Song JSON (by compound key):"
-      echo "$response" | jq .
-    fi
-  else
-    echo "Failed to get song by compound key."
-    exit 1
-  fi
-}
-
-get_random_song() {
-  echo "Getting a random song from the catalog..."
-  response=$(curl -s -X GET "$BASE_URL/get-random-song")
-  if echo "$response" | grep -q '"status": "success"'; then
-    echo "Random song retrieved successfully."
-    if [ "$ECHO_JSON" = true ]; then
-      echo "Random Song JSON:"
-      echo "$response" | jq .
-    fi
-  else
-    echo "Failed to get a random song."
+    echo "Failed to get song by name."
     exit 1
   fi
 }
@@ -420,18 +388,34 @@ swap_songs_in_playlist() {
 #
 ######################################################
 
-# Function to get the song leaderboard sorted by play count
-get_song_leaderboard() {
-  echo "Getting song leaderboard sorted by play count..."
-  response=$(curl -s -X GET "$BASE_URL/song-leaderboard?sort=play_count")
+# Function to get the song leaderboard sorted by wins
+get_meal_leaderboard_wins() {
+  echo "Getting meal leaderboard sorted by wins..."
+  response=$(curl -s -X GET "$BASE_URL/meal-leaderboard?sort=wins")
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Song leaderboard retrieved successfully."
+    echo "Meal leaderboard retrieved successfully."
     if [ "$ECHO_JSON" = true ]; then
-      echo "Leaderboard JSON (sorted by play count):"
+      echo "Leaderboard JSON (sorted by wins):"
       echo "$response" | jq .
     fi
   else
-    echo "Failed to get song leaderboard."
+    echo "Failed to get meal leaderboard."
+    exit 1
+  fi
+}
+
+# Function to get the song leaderboard sorted by win_pct
+get_meal_leaderboard_win_pct() {
+  echo "Getting meal leaderboard sorted by win_pct..."
+  response=$(curl -s -X GET "$BASE_URL/meal-leaderboard?sort=win_pct")
+  if echo "$response" | grep -q '"status": "success"'; then
+    echo "Meal leaderboard retrieved successfully."
+    if [ "$ECHO_JSON" = true ]; then
+      echo "Leaderboard JSON (sorted by wins):"
+      echo "$response" | jq .
+    fi
+  else
+    echo "Failed to get meal leaderboard."
     exit 1
   fi
 }
