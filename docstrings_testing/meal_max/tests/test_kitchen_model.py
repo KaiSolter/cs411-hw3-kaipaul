@@ -222,9 +222,9 @@ def test_get_leaderboard(mock_cursor):
 
     # Simulate that there are multiple songs in the database
     mock_cursor.fetchall.return_value = [
-        (1, "Meal A", "Cuisine A", 5.50, "LOW", 10, 8, False),
-        (2, "Meal B", "Cuisine B", 13.50, "MED", 10, 5, False),
-        (3, "Meal C", "Cuisine A", 40, "HIGH", 4, 4, False)
+        (1, "Meal A", "Cuisine A", 5.50, "LOW", 10, 8, 0.8, False),
+        (2, "Meal B", "Cuisine B", 13.50, "MED", 10, 5, 0.5, False),
+        (3, "Meal C", "Cuisine C", 40, "HIGH", 4, 4, 1, False)
     ]
 
     # Call the get_leaderboard function
@@ -232,9 +232,9 @@ def test_get_leaderboard(mock_cursor):
 
     # Ensure the results match the expected output
     expected_result = [
-        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 5.50, "difficulty": "LOW", "battles": 10, "wins": 8, "win_pct": 0.8},
-        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 13.50, "difficulty": "MED", "battles": 10, "wins": 5, "win_pct": 0.5},
-        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 40, "difficulty": "HIGH", "battles": 4, "wins": 4, "win_pct": 1}
+        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 5.50, "difficulty": "LOW", "battles": 10, "wins": 8, "win_pct": 80},
+        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 13.50, "difficulty": "MED", "battles": 10, "wins": 5, "win_pct": 50},
+        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 40, "difficulty": "HIGH", "battles": 4, "wins": 4, "win_pct": 100}
     ]
 
     assert meals == expected_result, f"Expected {expected_result}, but got {meals}"
@@ -250,19 +250,20 @@ def test_get_leaderboard(mock_cursor):
     assert actual_query == expected_query, "The SQL query did not match the expected structure."
 
     mock_cursor.fetchall.return_value = [
-        (1, "Meal A", "Cuisine A", 5.50, "LOW", 10, 8, False),
-        (2, "Meal B", "Cuisine B", 13.50, "MED", 10, 5, False),
-        (3, "Meal C", "Cuisine A", 40, "HIGH", 4, 4, False)
+        (3, "Meal C", "Cuisine C", 40, "HIGH", 4, 4, 1, False),
+        (1, "Meal A", "Cuisine A", 5.50, "LOW", 10, 8, 0.8, False),
+        (2, "Meal B", "Cuisine B", 13.50, "MED", 10, 5, 0.5, False)
     ]
 
     # Call the get_leaderboard function with param win_pct
     meals = get_leaderboard("win_pct")
 
     # Ensure the results match the expected output
+    
     expected_result = [
-        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 40, "difficulty": "HIGH", "battles": 4, "wins": 4, "win_pct": 1},
-        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 13.50, "difficulty": "MED", "battles": 10, "wins": 5, "win_pct": 0.5},
-        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 5.50, "difficulty": "LOW", "battles": 10, "wins": 8, "win_pct": 0.8}
+        {"id": 3, "meal": "Meal C", "cuisine": "Cuisine C", "price": 40, "difficulty": "HIGH", "battles": 4, "wins": 4, "win_pct": 100},
+        {"id": 1, "meal": "Meal A", "cuisine": "Cuisine A", "price": 5.50, "difficulty": "LOW", "battles": 10, "wins": 8, "win_pct": 80},
+        {"id": 2, "meal": "Meal B", "cuisine": "Cuisine B", "price": 13.50, "difficulty": "MED", "battles": 10, "wins": 5, "win_pct": 50}
     ]
 
     assert meals == expected_result, f"Expected {expected_result}, but got {meals}"
@@ -302,7 +303,7 @@ def test_update_meal_stats_win(mock_cursor):
     actual_arguments = mock_cursor.execute.call_args_list[1][0][1]
 
     # Assert that the SQL query was executed with the correct arguments (song ID, win)
-    expected_arguments = (meal_id, "win")
+    expected_arguments = (meal_id, )
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
 def test_update_meal_stats_loss(mock_cursor):
@@ -313,7 +314,7 @@ def test_update_meal_stats_loss(mock_cursor):
 
     # Call the update_play_count function with a sample song ID
     meal_id = 1
-    update_meal_stats(meal_id, "loss")
+    update_meal_stats(meal_id, "loss", )
 
     # Normalize the expected SQL query
     expected_query = normalize_whitespace("""
@@ -330,7 +331,7 @@ def test_update_meal_stats_loss(mock_cursor):
     actual_arguments = mock_cursor.execute.call_args_list[1][0][1]
 
     # Assert that the SQL query was executed with the correct arguments (song ID, loss)
-    expected_arguments = (meal_id, "loss")
+    expected_arguments = (meal_id, )
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
 ### Test for Updating a Deleted Meal:
@@ -342,7 +343,7 @@ def test_update_play_count_deleted_meal(mock_cursor):
 
     # Expect a ValueError when attempting to update a deleted song
     with pytest.raises(ValueError, match="Meal with ID 1 has been deleted"):
-        update_meal_stats(1)
+        update_meal_stats(1, "win")
 
     # Ensure that no SQL query for updating play count was executed
     mock_cursor.execute.assert_called_once_with("SELECT deleted FROM meals WHERE id = ?", (1,))
