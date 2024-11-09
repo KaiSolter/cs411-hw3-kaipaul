@@ -81,7 +81,7 @@ def test_create_meal_duplicate(mock_cursor):
     mock_cursor.execute.side_effect = sqlite3.IntegrityError("UNIQUE constraint failed: meal.meal")
 
     # Expect the function to raise a ValueError with a specific message when handling the IntegrityError
-    with pytest.raises(ValueError, match="Meal with name 'Meal Name' already exists."):
+    with pytest.raises(ValueError, match="Meal with name 'Meal Name' already exists"):
         create_meal(meal="Meal Name", cuisine="Meal Cuisine", price=5.50, difficulty="HIGH")
 
 def test_create_meal_invalid_price():
@@ -95,7 +95,7 @@ def test_create_meal_invalid_difficulty():
     """Test error when trying to create a meal with an invalid dificulty (e.g., not one of the 3 acceptable ones)"""
 
     # Attempt to create a song with a negative duration
-    with pytest.raises(ValueError, match="Invalid meal difficulty: 'not bad' \(Must be 'LOW', 'MED', or 'HIGH'.\)."):
+    with pytest.raises(ValueError, match="Invalid difficulty level: not bad. Must be 'LOW', 'MED', or 'HIGH'."):
         create_meal(meal="Meal Name", cuisine="Meal Cuisine", price=5.50, difficulty="not bad")
 
 def test_delete_meal(mock_cursor):
@@ -146,7 +146,7 @@ def test_delete_meal_already_deleted(mock_cursor):
     mock_cursor.fetchone.return_value = ([True])
 
     # Expect a ValueError when attempting to delete a song that's already been deleted
-    with pytest.raises(ValueError, match="Meal with ID 999 has already been deleted"):
+    with pytest.raises(ValueError, match="Meal with ID 999 has been deleted"):
         delete_meal(999)
 
 ######################################################
@@ -214,7 +214,7 @@ def test_get_meal_by_name(mock_cursor):
     actual_arguments = mock_cursor.execute.call_args[0][1]
 
     # Assert that the SQL query was executed with the correct arguments
-    expected_arguments = ("Meal Name")
+    expected_arguments = ("Meal Name",)
     assert actual_arguments == expected_arguments, f"The SQL query arguments did not match. Expected {expected_arguments}, got {actual_arguments}."
 
 def test_get_leaderboard(mock_cursor):
