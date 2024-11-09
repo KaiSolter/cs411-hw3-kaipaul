@@ -55,7 +55,9 @@ check_db() {
 
 clear_catalog() {
   echo "Clearing the db..."
-  curl -s -X DELETE "$BASE_URL/clear-meals" | grep -q '"status": "success"'
+  response=$(curl -s -X DELETE "$BASE_URL/clear-meals") 
+  echo "Response from clear catalog: $response" 
+  
 }
 
 create_meal() {
@@ -79,7 +81,7 @@ create_meal() {
 delete_meal_by_id() {
   meal_id=$1
 
-  echo "Deleting song by ID ($meal_id)..."
+  echo "Deleting meal by ID ($meal_id)..."
   response=$(curl -s -X DELETE "$BASE_URL/delete-meal/$meal_id")
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Meal deleted successfully by ID ($meal_id)."
@@ -93,7 +95,7 @@ get_meal_by_id() {
   meal_id=$1
 
   echo "Getting meal by ID ($meal_id)..."
-  response=$(curl -s -X GET "$BASE_URL/get-meal-from-kitchen-by-id/$meal_id")
+  response=$(curl -s -X GET "$BASE_URL/get-meal-by-id/$meal_id")
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Meal retrieved successfully by ID ($meal_id)."
     if [ "$ECHO_JSON" = true ]; then
@@ -101,7 +103,7 @@ get_meal_by_id() {
       echo "$response" | jq .
     fi
   else
-    echo "Failed to get mean by ID ($meal_id)."
+    echo "Failed to get meal by ID ($meal_id)."
     exit 1
   fi
 }
@@ -110,15 +112,15 @@ get_meal_by_name() {
   meal=$1
 
   echo "Getting meal by meal name (Meal: '$meal')..."
-  response=$(curl -s -X GET "$BASE_URL/get-meal-from-kitchen-by-name?meal=$(echo $meal | sed 's/ /%20/g')")
+  response=$(curl -s -X GET "$BASE_URL/get-meal-by-name/$meal")
   if echo "$response" | grep -q '"status": "success"'; then
-    echo "Meal retrieved successfully by compound key."
+    echo "Meal retrieved successfully by name."
     if [ "$ECHO_JSON" = true ]; then
       echo "Meal JSON (by name):"
       echo "$response" | jq .
     fi
   else
-    echo "Failed to get song by name."
+    echo "Failed to get meal by name."
     exit 1
   fi
 }
@@ -145,13 +147,14 @@ prep_combatant() {
       echo "$response" | jq .
     fi
   else
+    echo "$response"
     echo "Failed to add meal to combatants"
     exit 1
   fi
 }
 
 get_combatants() {
-  echo "Retrieving current song..."
+  echo "Retrieving current meal..."
   response=$(curl -s -X GET "$BASE_URL/get-combatants")
 
   if echo "$response" | grep -q '"status": "success"'; then
@@ -186,7 +189,7 @@ clear_combatants() {
 
 battle() {
   echo "Executing a battle..."
-  response=$(curl -s -X POST "$BASE_URL/battle")
+  response=$(curl -s -X GET "$BASE_URL/battle")
 
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Battle finished."
@@ -203,10 +206,10 @@ battle() {
 #
 ######################################################
 
-# Function to get the song leaderboard sorted by wins
+# Function to get the meal leaderboard sorted by wins
 get_meal_leaderboard_wins() {
   echo "Getting meal leaderboard sorted by wins..."
-  response=$(curl -s -X GET "$BASE_URL/meal-leaderboard?sort=wins")
+  response=$(curl -s -X GET "$BASE_URL/leaderboard?sort=wins")
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Meal leaderboard retrieved successfully."
     if [ "$ECHO_JSON" = true ]; then
@@ -214,15 +217,16 @@ get_meal_leaderboard_wins() {
       echo "$response" | jq .
     fi
   else
+    echo "$response" 
     echo "Failed to get meal leaderboard."
     exit 1
   fi
 }
 
-# Function to get the song leaderboard sorted by win_pct
+# Function to get the meal leaderboard sorted by win_pct
 get_meal_leaderboard_win_pct() {
   echo "Getting meal leaderboard sorted by win_pct..."
-  response=$(curl -s -X GET "$BASE_URL/meal-leaderboard?sort=win_pct")
+  response=$(curl -s -X GET "$BASE_URL/leaderboard?sort=win_pct")
   if echo "$response" | grep -q '"status": "success"'; then
     echo "Meal leaderboard retrieved successfully."
     if [ "$ECHO_JSON" = true ]; then
@@ -255,13 +259,14 @@ delete_meal_by_id 1
 get_meal_by_id 2
 get_meal_by_name "Pho" 
 
+clear_combatants
+
 prep_combatant "Tacos" 
 prep_combatant "Sushi" 
 battle
 clear_combatants
 prep_combatant "Pho" 
 prep_combatant "Pancakes"
-get_combatants
 battle
 
 get_meal_leaderboard_wins
